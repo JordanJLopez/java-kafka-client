@@ -128,14 +128,12 @@ TracingKafkaConsumer<Integer, String> tracingConsumer = new TracingKafkaConsumer
 The following BiFunctions are already included in the ClientSpanNameProvider class, with `CONSUMER_OPERATION_NAME` and `PRODUCER_OPERATION_NAME` being the default should no
 spanNameProvider be provided:
 
-| Consumer BiFunction | Producer BiFunction | Definition |
-| --- | --- | --- |
-| `CONSUMER_OPERATION_NAME` | `PRODUCER_OPERATION_NAME` | Returns the `operationName` as the span name ("receive" for Consumer, "send" for producer). |
-| `CONSUMER_PREFIXED_OPERATION_NAME(String prefix)` | `PRODUCER_PREFIXED_OPERATION_NAME(String prefix)` | Returns a String concatenation of `prefix` and `|
-| `CONSUMER_TOPIC` | `PRODUCER_TOPIC` | Returns the Kafka topic name that the record was pushed to/pulled from. |
-| `PREFIXED_CONSUMER_TOPIC(String prefix)` | `PREFIXED_PRODUCER_TOPIC(String prefix)` | Returns a String concatenation of `prefix` and the Kafka topic name (`record.topic()`). |
-| `CONSUMER_OPERATION_NAME_TOPIC` | `PRODUCER_OPERATION_NAME_TOPIC` | Returns "`operationName` - `record.topic()`". |
-| `CONSUMER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` | `PRODUCER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` | Returns a String concatenation of `prefix` and "`operationName` - `record.topic()`". |
+- `CONSUMER_OPERATION_NAME` and `PRODUCER_OPERATION_NAME` : Returns the `operationName` as the span name ("receive" for Consumer, "send" for producer).
+- `CONSUMER_PREFIXED_OPERATION_NAME(String prefix)` and `PRODUCER_PREFIXED_OPERATION_NAME(String prefix)` : Returns a String concatenation of `prefix` and `operatioName`.
+- `CONSUMER_TOPIC` and `PRODUCER_TOPIC` : Returns the Kafka topic name that the record was pushed to/pulled from (`record.topic()`).
+- `PREFIXED_CONSUMER_TOPIC(String prefix)` and `PREFIXED_PRODUCER_TOPIC(String prefix)` : Returns a String concatenation of `prefix` and the Kafka topic name (`record.topic()`).
+- `CONSUMER_OPERATION_NAME_TOPIC` and `PRODUCER_OPERATION_NAME_TOPIC` : Returns "`operationName` - `record.topic()`".
+- `CONSUMER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` and `PRODUCER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` : Returns a String concatenation of `prefix` and "`operationName` - `record.topic()`".
     
 
 
