@@ -19,6 +19,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.function.BiFunction;
 
+/**
+ * @author Jordan J Lopez
+ *  Returns a string to be used as the name of the spans, based on
+ *  the operation preformed and the record the span is based off of.
+ */
 public class ClientSpanNameProvider {
 
     // Operation Name as Span Name
