@@ -99,7 +99,8 @@ your own custom one.
 ```java
 // Create BiFunction for the KafkaConsumer that operates on (String operationName, ProducerRecord consumerRecord)
 // and returns a String to be used as the name
-BiFunction<String, ProducerRecord, String> producerSpanNameProvider = (operationName, producerRecord) -> "CUSTOM_PRODUCER_NAME";
+BiFunction<String, ProducerRecord, String> producerSpanNameProvider =
+    (operationName, producerRecord) -> "CUSTOM_PRODUCER_NAME";
 
 // Instantiate KafkaProducer
 KafkaProducer<Integer, String> producer = new KafkaProducer<>(senderProps);
@@ -113,7 +114,8 @@ TracingKafkaProducer<Integer, String> tracingProducer = new TracingKafkaProducer
 
 // Create BiFunction for the KafkaConsumer that operates on (String operationName, ConsumerRecord consumerRecord)
 // and returns a String to be used as the name
-BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider = (operationName, consumerRecord) -> operationName.toUpperCase();
+BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider =
+    (operationName, consumerRecord) -> operationName.toUpperCase();
 // Instantiate KafkaConsumer
 KafkaConsumer<Integer, String> consumer = new KafkaConsumer<>(consumerProps);
 // Decorate KafkaConsumer with TracingKafkaConsumer, passing in the consumerSpanNameProvider BiFunction
