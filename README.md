@@ -97,8 +97,9 @@ argument to the TracingKafkaConsumer or TracingKafkaProducer constructors, eithe
 your own custom one.
 
 ```java
-// Create BiFunction for the KafkaConsumer that operates on (String operationName, ProducerRecord consumerRecord)
-// and returns a String to be used as the name
+// Create BiFunction for the KafkaConsumer that operates on
+// (String operationName, ProducerRecord consumerRecord) and
+// returns a String to be used as the name
 BiFunction<String, ProducerRecord, String> producerSpanNameProvider =
     (operationName, producerRecord) -> "CUSTOM_PRODUCER_NAME";
 
@@ -112,8 +113,9 @@ TracingKafkaProducer<Integer, String> tracingProducer = new TracingKafkaProducer
 // Spans created by the tracingProducer will now have "CUSTOM_PRODUCER_NAME" as the span name.
 
 
-// Create BiFunction for the KafkaConsumer that operates on (String operationName, ConsumerRecord consumerRecord)
-// and returns a String to be used as the name
+// Create BiFunction for the KafkaConsumer that operates on
+// (String operationName, ConsumerRecord consumerRecord) and
+// returns a String to be used as the name
 BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider =
     (operationName, consumerRecord) -> operationName.toUpperCase();
 // Instantiate KafkaConsumer
