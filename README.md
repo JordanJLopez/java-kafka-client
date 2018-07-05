@@ -97,7 +97,7 @@ argument to the TracingKafkaConsumer or TracingKafkaProducer constructors, eithe
 your own custom one.
 
 ```java
-// Create BiFunction for the KafkaConsumer that operates on
+// Create BiFunction for the KafkaProducer that operates on
 // (String operationName, ProducerRecord consumerRecord) and
 // returns a String to be used as the name
 BiFunction<String, ProducerRecord, String> producerSpanNameProvider =
@@ -126,18 +126,7 @@ TracingKafkaConsumer<Integer, String> tracingConsumer = new TracingKafkaConsumer
         consumerSpanNameProvider);
 // Spans created by the tracingConsumer will now have the capitalized operation name as the span name.
 // "recieve" -> "RECIEVE"
-```
-
-The following BiFunctions are already included in the ClientSpanNameProvider class, with `CONSUMER_OPERATION_NAME` and `PRODUCER_OPERATION_NAME` being the default should no
-spanNameProvider be provided:
-
-- `CONSUMER_OPERATION_NAME` and `PRODUCER_OPERATION_NAME` : Returns the `operationName` as the span name ("receive" for Consumer, "send" for producer).
-- `CONSUMER_PREFIXED_OPERATION_NAME(String prefix)` and `PRODUCER_PREFIXED_OPERATION_NAME(String prefix)` : Returns a String concatenation of `prefix` and `operatioName`.
-- `CONSUMER_TOPIC` and `PRODUCER_TOPIC` : Returns the Kafka topic name that the record was pushed to/pulled from (`record.topic()`).
-- `PREFIXED_CONSUMER_TOPIC(String prefix)` and `PREFIXED_PRODUCER_TOPIC(String prefix)` : Returns a String concatenation of `prefix` and the Kafka topic name (`record.topic()`).
-- `CONSUMER_OPERATION_NAME_TOPIC` and `PRODUCER_OPERATION_NAME_TOPIC` : Returns "`operationName` - `record.topic()`".
-- `CONSUMER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` and `PRODUCER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` : Returns a String concatenation of `prefix` and "`operationName` - `record.topic()`".
-    
+```  
 
 
 #### Interceptors based solution
@@ -219,6 +208,51 @@ public KafkaTemplate<Integer, String> kafkaTemplate() {
 
 ```
 
+##### Custom Span Names for Spring Kafka
+The Spring Kafka factory implementations include support for custom span names by passing in a BiFunction object as an additional
+argument to the TracingConsumerFactory or TracingProducerFactory constructors, either one of the provided BiFunctions or
+your own custom one.
+
+```java
+// Create BiFunction for the KafkaProducerFactory that operates on
+// (String operationName, ProducerRecord consumerRecord) and
+// returns a String to be used as the name
+BiFunction<String, ProducerRecord, String> producerSpanNameProvider =
+    (operationName, producerRecord) -> "CUSTOM_PRODUCER_NAME";
+
+// Decorate ProducerFactory with TracingProducerFactory
+@Bean
+public ProducerFactory<Integer, String> producerFactory() {
+  return new TracingProducerFactory<>(new DefaultKafkaProducerFactory<>(producerProps()), tracer());
+}
+// Spans created by the tracingProducer will now have "CUSTOM_PRODUCER_NAME" as the span name.
+
+
+// Create BiFunction for the KafkaConsumerFactory that operates on
+// (String operationName, ConsumerRecord consumerRecord) and
+// returns a String to be used as the name
+BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider =
+    (operationName, consumerRecord) -> operationName.toUpperCase();
+
+// Decorate ConsumerFactory with TracingConsumerFactory
+@Bean
+public ConsumerFactory<Integer, String> consumerFactory() {
+  return new TracingConsumerFactory<>(new DefaultKafkaConsumerFactory<>(consumerProps()), tracer());
+}
+// Consumers produced by the traced consumerFactory
+```
+
+#### Pre-made Span Name Providers
+
+The following BiFunctions are already included in the ClientSpanNameProvider class, with `CONSUMER_OPERATION_NAME` and `PRODUCER_OPERATION_NAME` being the default should no
+spanNameProvider be provided:
+
+- `CONSUMER_OPERATION_NAME` and `PRODUCER_OPERATION_NAME` : Returns the `operationName` as the span name ("receive" for Consumer, "send" for producer).
+- `CONSUMER_PREFIXED_OPERATION_NAME(String prefix)` and `PRODUCER_PREFIXED_OPERATION_NAME(String prefix)` : Returns a String concatenation of `prefix` and `operatioName`.
+- `CONSUMER_TOPIC` and `PRODUCER_TOPIC` : Returns the Kafka topic name that the record was pushed to/pulled from (`record.topic()`).
+- `PREFIXED_CONSUMER_TOPIC(String prefix)` and `PREFIXED_PRODUCER_TOPIC(String prefix)` : Returns a String concatenation of `prefix` and the Kafka topic name (`record.topic()`).
+- `CONSUMER_OPERATION_NAME_TOPIC` and `PRODUCER_OPERATION_NAME_TOPIC` : Returns "`operationName` - `record.topic()`".
+- `CONSUMER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` and `PRODUCER_PREFIXED_OPERATION_NAME_TOPIC(String prefix)` : Returns a String concatenation of `prefix` and "`operationName` - `record.topic()`".
 
 [ci-img]: https://travis-ci.org/opentracing-contrib/java-kafka-client.svg?branch=master
 [ci]: https://travis-ci.org/opentracing-contrib/java-kafka-client
