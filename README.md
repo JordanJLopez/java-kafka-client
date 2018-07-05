@@ -108,7 +108,6 @@ KafkaProducer<Integer, String> producer = new KafkaProducer<>(senderProps);
 TracingKafkaProducer<Integer, String> tracingProducer = new TracingKafkaProducer<>(producer, 
         tracer,
         producerSpanNameProvider);
-
 // Spans created by the tracingProducer will now have "CUSTOM_PRODUCER_NAME" as the span name.
 
 
