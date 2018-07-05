@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
@@ -37,11 +38,20 @@ public class TracingKafkaConsumer<K, V> implements Consumer<K, V> {
 
   private final Tracer tracer;
   private final Consumer<K, V> consumer;
+  private final BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider;
 
 
   public TracingKafkaConsumer(Consumer<K, V> consumer, Tracer tracer) {
     this.consumer = consumer;
     this.tracer = tracer;
+    this.consumerSpanNameProvider = ClientSpanNameProvider.CONSUMER_OPERATION_NAME;
+  }
+
+  public TracingKafkaConsumer(Consumer<K, V> consumer, Tracer tracer,
+                              BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider) {
+    this.consumer = consumer;
+    this.tracer = tracer;
+    this.consumerSpanNameProvider = consumerSpanNameProvider;
   }
 
   @Override
@@ -89,7 +99,7 @@ public class TracingKafkaConsumer<K, V> implements Consumer<K, V> {
     ConsumerRecords<K, V> records = consumer.poll(timeout);
 
     for (ConsumerRecord<K, V> record : records) {
-      TracingKafkaUtils.buildAndFinishChildSpan(record, tracer);
+      TracingKafkaUtils.buildAndFinishChildSpan(record, tracer, consumerSpanNameProvider);
     }
 
     return records;
