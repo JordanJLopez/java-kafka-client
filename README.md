@@ -92,7 +92,7 @@ SpanContext spanContext = TracingKafkaUtils.extractSpanContext(record.headers(),
 ```
 
 ##### Custom Span Names for Decorators based solution
-The decorators based solution includes support for custom span names by passing in a BiFunction object as an additional
+The decorator-based solution includes support for custom span names by passing in a BiFunction object as an additional
 argument to the TracingKafkaConsumer or TracingKafkaProducer constructors, either one of the provided BiFunctions or
 your own custom one.
 
@@ -125,7 +125,7 @@ TracingKafkaConsumer<Integer, String> tracingConsumer = new TracingKafkaConsumer
         tracer,
         consumerSpanNameProvider);
 // Spans created by the tracingConsumer will now have the capitalized operation name as the span name.
-// "recieve" -> "RECIEVE"
+// "receive" -> "RECEIVE"
 ```  
 
 
