@@ -14,7 +14,6 @@
 
 package io.opentracing.contrib.kafka;
 
-import io.opentracing.contrib.kafka.ClientSpanNameProvider;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Test;
@@ -25,46 +24,51 @@ import static org.junit.Assert.assertEquals;
 
 public class TopicSpanNameTest {
 
-    @Test
-    public void topicSpanNameTest() {
+  private final ConsumerRecord<String, Integer> consumerRecord = new ConsumerRecord("example_topic", 0, 0, "KEY", 999);
+  private final ProducerRecord<String, Integer> producerRecord = new ProducerRecord("example_topic", 0, System.currentTimeMillis(), "KEY", 999);
+  private BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider;
+  private BiFunction<String, ProducerRecord, String> producerSpanNameProvider;
 
-        BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider = ClientSpanNameProvider.CONSUMER_TOPIC;
-        BiFunction<String, ProducerRecord, String> producerSpanNameProvider = ClientSpanNameProvider.PRODUCER_TOPIC;
+  @Test
+  public void topicSpanNameTest() {
 
-        ConsumerRecord<String, Integer> consumerRecord = new ConsumerRecord("example_topic", 0, 0, "KEY", 999);
-        ProducerRecord<String, Integer> producerRecord = new ProducerRecord("example_topic", 0,  System.currentTimeMillis(), "KEY", 999);
+    consumerSpanNameProvider = ClientSpanNameProvider.CONSUMER_TOPIC;
+    producerSpanNameProvider = ClientSpanNameProvider.PRODUCER_TOPIC;
 
-        assertEquals("example_topic", consumerSpanNameProvider.apply("receive", consumerRecord));
-        assertEquals("example_topic", producerSpanNameProvider.apply("send", producerRecord));
+    assertEquals("example_topic", consumerSpanNameProvider.apply("receive", consumerRecord));
+    assertEquals("example_topic", producerSpanNameProvider.apply("send", producerRecord));
 
-        assertEquals("example_topic", consumerSpanNameProvider.apply(null, consumerRecord));
-        assertEquals("example_topic", producerSpanNameProvider.apply(null, producerRecord));
+    assertEquals("example_topic", consumerSpanNameProvider.apply(null, consumerRecord));
+    assertEquals("example_topic", producerSpanNameProvider.apply(null, producerRecord));
 
-        assertEquals("unknown", consumerSpanNameProvider.apply("receive", null));
-        assertEquals("unknown", producerSpanNameProvider.apply("send", null));
+    assertEquals("unknown", consumerSpanNameProvider.apply("receive", null));
+    assertEquals("unknown", producerSpanNameProvider.apply("send", null));
+  }
 
-        consumerSpanNameProvider = ClientSpanNameProvider.CONSUMER_PREFIXED_TOPIC("KafkaClient: ");
-        producerSpanNameProvider = ClientSpanNameProvider.PRODUCER_PREFIXED_TOPIC("KafkaClient: ");
+  @Test
+  public void prefixedTopicSpanNameTest() {
+    consumerSpanNameProvider = ClientSpanNameProvider.CONSUMER_PREFIXED_TOPIC("KafkaClient: ");
+    producerSpanNameProvider = ClientSpanNameProvider.PRODUCER_PREFIXED_TOPIC("KafkaClient: ");
 
-        assertEquals("KafkaClient: example_topic", consumerSpanNameProvider.apply("receive", consumerRecord));
-        assertEquals("KafkaClient: example_topic", producerSpanNameProvider.apply("send", producerRecord));
+    assertEquals("KafkaClient: example_topic", consumerSpanNameProvider.apply("receive", consumerRecord));
+    assertEquals("KafkaClient: example_topic", producerSpanNameProvider.apply("send", producerRecord));
 
-        assertEquals("KafkaClient: example_topic", consumerSpanNameProvider.apply(null, consumerRecord));
-        assertEquals("KafkaClient: example_topic", producerSpanNameProvider.apply(null, producerRecord));
+    assertEquals("KafkaClient: example_topic", consumerSpanNameProvider.apply(null, consumerRecord));
+    assertEquals("KafkaClient: example_topic", producerSpanNameProvider.apply(null, producerRecord));
 
-        assertEquals("KafkaClient: unknown", consumerSpanNameProvider.apply("receive", null));
-        assertEquals("KafkaClient: unknown", producerSpanNameProvider.apply("send", null));
+    assertEquals("KafkaClient: unknown", consumerSpanNameProvider.apply("receive", null));
+    assertEquals("KafkaClient: unknown", producerSpanNameProvider.apply("send", null));
 
-        consumerSpanNameProvider = ClientSpanNameProvider.CONSUMER_PREFIXED_TOPIC(null);
-        producerSpanNameProvider = ClientSpanNameProvider.PRODUCER_PREFIXED_TOPIC(null);
+    consumerSpanNameProvider = ClientSpanNameProvider.CONSUMER_PREFIXED_TOPIC(null);
+    producerSpanNameProvider = ClientSpanNameProvider.PRODUCER_PREFIXED_TOPIC(null);
 
-        assertEquals("example_topic", consumerSpanNameProvider.apply("receive", consumerRecord));
-        assertEquals("example_topic", producerSpanNameProvider.apply("send", producerRecord));
+    assertEquals("example_topic", consumerSpanNameProvider.apply("receive", consumerRecord));
+    assertEquals("example_topic", producerSpanNameProvider.apply("send", producerRecord));
 
-        assertEquals("example_topic", consumerSpanNameProvider.apply(null, consumerRecord));
-        assertEquals("example_topic", producerSpanNameProvider.apply(null, producerRecord));
+    assertEquals("example_topic", consumerSpanNameProvider.apply(null, consumerRecord));
+    assertEquals("example_topic", producerSpanNameProvider.apply(null, producerRecord));
 
-        assertEquals("unknown", consumerSpanNameProvider.apply("receive", null));
-        assertEquals("unknown", producerSpanNameProvider.apply("send", null));
-    }
+    assertEquals("unknown", consumerSpanNameProvider.apply("receive", null));
+    assertEquals("unknown", producerSpanNameProvider.apply("send", null));
+  }
 }

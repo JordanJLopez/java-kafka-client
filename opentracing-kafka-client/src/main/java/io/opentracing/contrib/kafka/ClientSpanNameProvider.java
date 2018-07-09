@@ -26,54 +26,65 @@ import java.util.function.BiFunction;
  */
 public class ClientSpanNameProvider {
 
-    // Operation Name as Span Name
+  // Operation Name as Span Name
+  public static BiFunction<String, ConsumerRecord, String> CONSUMER_OPERATION_NAME =
+      (operationName, consumerRecord) -> replaceIfNull(operationName, "unknown");
+  public static BiFunction<String, ProducerRecord, String> PRODUCER_OPERATION_NAME =
+      (operationName, producerRecord) -> replaceIfNull(operationName, "unknown");
 
-    public static BiFunction<String, ConsumerRecord, String> CONSUMER_OPERATION_NAME =
-            (operationName, consumerRecord) -> ((operationName == null) ? "unknown" : operationName);
-    public static BiFunction<String, ProducerRecord, String> PRODUCER_OPERATION_NAME =
-            (operationName, producerRecord) -> ((operationName == null) ? "unknown" : operationName);
+  public static BiFunction<String, ConsumerRecord, String> CONSUMER_PREFIXED_OPERATION_NAME(final String prefix) {
+    return (operationName, consumerRecord) -> replaceIfNull(prefix, "")
+        + replaceIfNull(operationName, "unknown");
+  }
+  public static BiFunction<String, ProducerRecord, String> PRODUCER_PREFIXED_OPERATION_NAME(final String prefix) {
+    return (operationName, producerRecord) -> replaceIfNull(prefix, "")
+        + replaceIfNull(operationName, "unknown");
+  }
 
-    public static BiFunction<String, ConsumerRecord, String> CONSUMER_PREFIXED_OPERATION_NAME(final String prefix) {
-        return (operationName, consumerRecord) -> ((prefix == null) ? "" : prefix)
-                + ((operationName == null) ? "unknown" : operationName);
-    }
-    public static BiFunction<String, ProducerRecord, String> PRODUCER_PREFIXED_OPERATION_NAME(final String prefix) {
-        return (operationName, producerRecord) -> ((prefix == null) ? "" : prefix)
-                + ((operationName == null) ? "unknown" : operationName);
-    }
+  // Topic as Span Name
+  public static BiFunction<String, ConsumerRecord, String> CONSUMER_TOPIC =
+      (operationName, consumerRecord) -> replaceIfNull(consumerRecord, "unknown");
+  public static BiFunction<String, ProducerRecord, String> PRODUCER_TOPIC =
+      (operationName, producerRecord) -> replaceIfNull(producerRecord, "unknown");
 
-    // Topic as Span Name
-    public static BiFunction<String, ConsumerRecord, String> CONSUMER_TOPIC =
-            (operationName, consumerRecord) -> ((consumerRecord == null) ? "unknown" : consumerRecord.topic());
-    public static BiFunction<String, ProducerRecord, String> PRODUCER_TOPIC =
-            (operationName, producerRecord) -> ((producerRecord == null) ? "unknown" : producerRecord.topic());
+  public static BiFunction<String, ConsumerRecord, String> CONSUMER_PREFIXED_TOPIC(final String prefix) {
+    return (operationName, consumerRecord) -> replaceIfNull(prefix, "")
+        + replaceIfNull(consumerRecord, "unknown");
+  }
+  public static BiFunction<String, ProducerRecord, String> PRODUCER_PREFIXED_TOPIC(final String prefix) {
+    return (operationName, producerRecord) -> replaceIfNull(prefix, "")
+        + replaceIfNull(producerRecord, "unknown");
+  }
 
-    public static BiFunction<String, ConsumerRecord, String> CONSUMER_PREFIXED_TOPIC(final String prefix) {
-        return (operationName, consumerRecord) -> ((prefix == null) ? "" : prefix)
-                + ((consumerRecord == null) ? "unknown" : consumerRecord.topic());
-    }
-    public static BiFunction<String, ProducerRecord, String> PRODUCER_PREFIXED_TOPIC(final String prefix) {
-        return (operationName, producerRecord) -> ((prefix == null) ? "" : prefix)
-                + ((producerRecord == null) ? "unknown" : producerRecord.topic());
-    }
+  // Operation Name and Topic as Span Name
+  public static BiFunction<String, ConsumerRecord, String> CONSUMER_OPERATION_NAME_TOPIC =
+      (operationName, consumerRecord) -> replaceIfNull(operationName, "unknown")
+      + " - " + replaceIfNull(consumerRecord, "unknown");
+  public static BiFunction<String, ProducerRecord, String> PRODUCER_OPERATION_NAME_TOPIC =
+      (operationName, producerRecord) -> replaceIfNull(operationName, "unknown")
+      + " - " + replaceIfNull(producerRecord, "unknown");
 
-    // Operation Name and Topic as Span Name
-    public static BiFunction<String, ConsumerRecord, String> CONSUMER_OPERATION_NAME_TOPIC =
-            (operationName, consumerRecord) -> ((operationName == null) ? "unknown" : operationName)
-            + " - " + ((consumerRecord == null) ? "unknown" : consumerRecord.topic());
-    public static BiFunction<String, ProducerRecord, String> PRODUCER_OPERATION_NAME_TOPIC =
-            (operationName, producerRecord) -> ((operationName == null) ? "unknown" : operationName)
-            + " - " + ((producerRecord == null) ? "unknown" : producerRecord.topic());
+  public static BiFunction<String, ConsumerRecord, String> CONSUMER_PREFIXED_OPERATION_NAME_TOPIC(final String prefix) {
+    return (operationName, consumerRecord) -> replaceIfNull(prefix, "")
+        + replaceIfNull(operationName, "unknown")
+        + " - " + replaceIfNull(consumerRecord, "unknown");
+  }
+  public static BiFunction<String, ProducerRecord, String> PRODUCER_PREFIXED_OPERATION_NAME_TOPIC(final String prefix) {
+    return (operationName, producerRecord) -> replaceIfNull(prefix, "")
+        + replaceIfNull(operationName, "unknown")
+        + " - " + replaceIfNull(producerRecord, "unknown");
+  }
 
-    public static BiFunction<String, ConsumerRecord, String> CONSUMER_PREFIXED_OPERATION_NAME_TOPIC(final String prefix) {
-        return (operationName, consumerRecord) -> ((prefix == null) ? "" : prefix)
-                + ((operationName == null) ? "unknown" : operationName)
-                + " - " + ((consumerRecord == null) ? "unknown" : consumerRecord.topic());
-    }
-    public static BiFunction<String, ProducerRecord, String> PRODUCER_PREFIXED_OPERATION_NAME_TOPIC(final String prefix) {
-        return (operationName, producerRecord) -> ((prefix == null) ? "" : prefix)
-                + ((operationName == null) ? "unknown" : operationName)
-                + " - " + ((producerRecord == null) ? "unknown" : producerRecord.topic());
-    }
+  private static String replaceIfNull(String input, String replacement) {
+    return (input == null) ? replacement : input;
+  }
+
+  private static String replaceIfNull(ConsumerRecord input, String replacement) {
+    return ((input == null) ? replacement : input.topic());
+  }
+
+  private static String replaceIfNull(ProducerRecord input, String replacement) {
+    return ((input == null) ? replacement : input.topic());
+  }
 
 }
