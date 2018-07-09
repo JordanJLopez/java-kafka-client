@@ -40,7 +40,9 @@ public class TracingConsumerFactory<K, V> implements ConsumerFactory<K, V> {
                                 BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider) {
     this.tracer = tracer;
     this.consumerFactory = consumerFactory;
-    this.consumerSpanNameProvider = consumerSpanNameProvider;
+    this.consumerSpanNameProvider = (consumerSpanNameProvider == null)
+      ? ClientSpanNameProvider.CONSUMER_OPERATION_NAME
+      : consumerSpanNameProvider;
   }
 
   @Override

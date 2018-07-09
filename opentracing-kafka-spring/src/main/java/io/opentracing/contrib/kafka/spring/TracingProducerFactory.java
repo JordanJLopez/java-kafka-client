@@ -38,7 +38,9 @@ public class TracingProducerFactory<K, V> implements ProducerFactory<K, V> {
                                 BiFunction<String, ProducerRecord, String> producerSpanNameProvider) {
     this.producerFactory = producerFactory;
     this.tracer = tracer;
-    this.producerSpanNameProvider = producerSpanNameProvider;
+    this.producerSpanNameProvider = (producerSpanNameProvider == null)
+      ? ClientSpanNameProvider.PRODUCER_OPERATION_NAME
+      : producerSpanNameProvider;
   }
 
   @Override

@@ -47,8 +47,12 @@ public class TracingKafkaClientSupplier implements KafkaClientSupplier {
                                     BiFunction<String, ConsumerRecord, String> consumerSpanNameProvider,
                                     BiFunction<String, ProducerRecord, String> producerSpanNameProvider) {
     this.tracer = tracer;
-    this.consumerSpanNameProvider = consumerSpanNameProvider;
-    this.producerSpanNameProvider = producerSpanNameProvider;
+    this.consumerSpanNameProvider = (consumerSpanNameProvider == null)
+            ? ClientSpanNameProvider.CONSUMER_OPERATION_NAME
+            : consumerSpanNameProvider;
+    this.producerSpanNameProvider = (producerSpanNameProvider == null)
+            ? ClientSpanNameProvider.PRODUCER_OPERATION_NAME
+            : producerSpanNameProvider;
   }
 
   // This method is required by Kafka Streams >=1.1, and optional for Kafka Streams <1.1

@@ -52,7 +52,9 @@ public class TracingKafkaProducer<K, V> implements Producer<K, V> {
   public TracingKafkaProducer(Producer<K, V> producer, Tracer tracer, BiFunction<String, ProducerRecord, String> producerSpanNameProvider) {
     this.producer = producer;
     this.tracer = tracer;
-    this.producerSpanNameProvider = producerSpanNameProvider;
+    this.producerSpanNameProvider = (producerSpanNameProvider == null)
+      ? ClientSpanNameProvider.PRODUCER_OPERATION_NAME
+      : producerSpanNameProvider;
   }
 
   @Override

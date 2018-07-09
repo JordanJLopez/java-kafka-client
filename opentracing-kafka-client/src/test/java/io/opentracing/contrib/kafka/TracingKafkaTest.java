@@ -202,7 +202,7 @@ public class TracingKafkaTest {
   }
 
   private void createConsumer(final CountDownLatch latch, final Integer key,
-      final boolean withInterceptor, BiFunction<String, ConsumerRecord, String> consumerNameProvider)
+      final boolean withInterceptor, final BiFunction<String, ConsumerRecord, String> consumerNameProvider)
       throws InterruptedException {
 
 
@@ -222,8 +222,7 @@ public class TracingKafkaTest {
       if (withInterceptor) {
         consumer = kafkaConsumer;
       } else {
-        consumer = (consumerNameProvider == null) ? new TracingKafkaConsumer<>(kafkaConsumer, mockTracer)
-                : new TracingKafkaConsumer<>(kafkaConsumer, mockTracer, consumerNameProvider);
+        consumer = new TracingKafkaConsumer<>(kafkaConsumer, mockTracer, consumerNameProvider);
       }
       consumer.subscribe(Collections.singletonList("messages"));
 
